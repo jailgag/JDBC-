@@ -1,15 +1,23 @@
 package Day03.pstmt.member.common;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+//import java.io.FileReader;
+//import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class JDBCTemplate {
 	
-	private static final String DRIVER_NAME = "oracle.jdbc.driver.OracleDriver";
-	private static final String URL = "jdbc:oracle:thin:@127.0.0.1:1521:xe";
-	private static final String USERNAME = "KH";
-	private static final String PASSWORD = "KH";
+private static final String FILE_NAME = "resources/dev.properties";
+//	private static final String DRIVER_NAME = "oracle.jdbc.driver.OracleDriver";
+//	private static final String URL = "jdbc:oracle:thin:@127.0.0.1:1521:xe";
+//	private static final String USERNAME = "KH";
+//	private static final String PASSWORD = "KH";
 	
 	/*
 	 * Connection에 싱글톤을 적용하지 않은이유!!
@@ -17,7 +25,8 @@ public class JDBCTemplate {
 	 * 재사용할수 있는 기술) 을 사용하려고 하는것이지만 싱글톤을
 	 * 적용하고 Connection Pool이
 	 * 동작하는 코드는 없기때문에 적용하지 않음!!!!!
-	 * 
+	 * -> Connection 을 만드는 메소드를 가지고 있는 JDBCTemplate에
+	 * 싱글톤을 적용하여 사용함!
 	 */
 
 	//여기다가 먼저 스타트!!!할걸!!다시 시작!!01/27 16:50 
@@ -42,20 +51,42 @@ public class JDBCTemplate {
 	//private static Connection conn;(지우는코드이나 주석처리함!!)
 	
 	//1.생성자 만들고! public으로 만들었으나 2.코드작성후 private로변경!
+	
+	//***properties 적용시코드
+	private Properties prop;
+	
+	
 	private JDBCTemplate() {
 		//아래에서 여기로 이동했음!!!Class.forName(DRIVER_NAME);
 		//생성자안에서 드라이버등록을해준다!!!
 		//그러면 아래
 		//public Connection getConnection() throws ClassNotFoundException, 
 		//에서 ClassNotFoundException?안해도된다??다시 아래로 이동!!
-		try {
-			Class.forName(DRIVER_NAME);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+			//dev.properties적용시아래코드작성!
+		//코드 작성시 잘못작성해서 트라이캐치잘못함..
+		//강사님유튭properties 1 에있었음!!복습하기!!
+			
+			try {
+				Reader reader = new FileReader(FILE_NAME); //스트림 열어서!!
+				prop = new Properties(); //읽은파일 사용하기!!
+				prop.load(reader);					//사용준비완료!!
+				String driverName = prop.getProperty("driverName");
+				Class.forName(driverName);
+				
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
-	}
+
 	
 	//3.아래코드 작성
 	//public static JDBCTemplate getjdbcTemplate() {
@@ -83,10 +114,23 @@ public class JDBCTemplate {
 	//(ClassNotFoundException 을 쓰고 있기때문에 아래에서 지움!!
 	//그럼 다시 memberService로 이동해서 
 	//ClassNotFoundException 다 지우로 이동!!
+	
+	//**코드가 복잡하여 정리한번했음!!!다시 properties적용후코드!!
+	//지울건 지웠음...
 	public Connection getConnection() throws  SQLException {
-		
+		Connection conn = null; 
+//		if(conn == null) {
+		String url = prop.getProperty("url");
+		String userName = prop.getProperty("username");
+		String password = prop.getProperty("password");
+		conn = DriverManager.getConnection(url,userName,password);
+		return conn;
+
+			
+//		}
+	}
+}
 		//1.3이동하고 아래코드 작성!!!
-		Connection conn = null; //1.3추가코드완료!!
 		
 		//6.아래 코드 작성후!
 		//Class.forName(DRIVER_NAME);
@@ -97,7 +141,6 @@ public class JDBCTemplate {
 //		}
 	//============================================	
 		
-		if(conn == null) {
 			//아래코드 남겨둠!!주석처리!!
 			//복붙해서 위로 올라감!!!!
 			
@@ -109,8 +152,3 @@ public class JDBCTemplate {
 			//7. 아래코드에서 Connection conn = DriverM~
 			//Connection빼줌!!!!빼주기전 코드는 주석처리해줌!!
 //			Connection conn = DriverManager.getConnection(URL,USERNAME,PASSWORD);
-			conn = DriverManager.getConnection(URL,USERNAME,PASSWORD);
-			}
-		return conn;
-	}
-}

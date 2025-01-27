@@ -1,5 +1,9 @@
 package Day03.pstmt.member.moder.dao;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -9,17 +13,58 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import Day03.pstmt.member.moder.vo.Member;
 
 
 
 public class MemberDAO {
+	
+	private static final String FILE_NAME = "resources/query.properties";
+	private Properties prop;
+	
+	public MemberDAO() {
+		try {
+			Reader reader = new FileReader(FILE_NAME);
+			prop = new Properties();
+			prop.load(reader); //2번째 캐치!!
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
+	
+	
+	/*
+	 * POJO(Plain Old Java Object
+	 * 자바로 생성하는 순수한객체
+	 * 
+	 * POJO(Plain Old Java Object) -자바로 생성하는 순수한객체
+	 * POJO프로그래밍
+	 * 1. 자바나 자바의 스펙의 정의된 것 이외엔 다른 기술이나 제약에
+	 * 얽매이지 않아야한다.
+	 * 2. 특정 환경에 종속적이지 않아야 한다.
+	 * -> POJO 프로그래밍을 지향한다.
+	 * 깨알 유툽강의 !!!
+	 */
+
+	
+	
+	
+	
+// 	아래코드는 지움!!주석처리함!!!다시 살림!!
 	private static final String DRIVER_NAME = "oracle.jdbc.driver.OracleDriver";
 	private static final String URL = "jdbc:oracle:thin:@127.0.0.1:1521:xe";
 	private static final String USERNAME = "KH";
 	private static final String PASSWORD = "KH";
-
+	
 	/*
 	 * 여기서 JDBC 코딩
 	 * 1.드라이버 등로
@@ -49,6 +94,9 @@ public class MemberDAO {
 		//01/27 pstmt 03실습!!
 		//아래코드 시작!!*1번!!
 		query ="INSERT INTO MEMBER_TBL(MEMBER_ID, MEMBER_PWD, MEMBER_NAME, AGE) VALUES(?,?,?,?)";
+		
+		//아래코드는 properties 쿼리문!!
+		query = prop.getProperty("insertMember");
 		
 		int result = 0; 
 		//Connection conn= null; 주석처리!!!(Connection conn,~~_)추가후
@@ -101,8 +149,13 @@ public class MemberDAO {
 		
 		//***이것도 pstmt로 바꿔줌??강사님 깃허브보고 셋팅!!
 		//List는 안건드리신거같음!!
+		//쿼리문 수정!!01/28~
+		//String query = "SELECT * FROM MEMBER_TBL"; 
+		String query = "SELECT * FROM MEMBER_TBL ORDER BY ENROLL_DATE DESC"; 
 		
-		String query = "SELECT * FROM MEMBER_TBL"; 
+		//아래코드는 properties 쿼리문
+		query = prop.getProperty("selectList");
+		
 		List<Member> mList = new ArrayList<Member>();
 		//Connection conn=null; //**2.지우고!!
 		Statement stmt=null;
@@ -154,6 +207,11 @@ public class MemberDAO {
 		String query = "SELECT * FROM MEMBER_TBL WHERE MEMBER_ID ='"+memberId+"'";
 		//위코드대신~아래코드 물음표로 대체!!!
 		query = "SELECT * FROM MEMBER_TBL WHERE MEMBER_ID = ?"; //*1.
+		
+		//아래코드는 properties 쿼리문
+		query = prop.getProperty("selectOneById");
+		
+		
 		Member member = null;
 		//Connection conn =null;  **2. (Connection conn,~~)추가후 지우기!!
 		Statement stmt =null;
@@ -211,6 +269,9 @@ public class MemberDAO {
 		//String query = "DELETE FROM MEMBER_TBL WHERE MEMBER_ID ='"+memberId+"'";
 		//**1.query문 재 작성 아래코드
 		query ="DELETE FROM MEMBER_TBL WHERE LOWER(MEMBER_ID) = ? ";
+		
+		//아래코드는 propereties 쿼리문
+		query = prop.getProperty("deleteMember");
 		
 		//Connection conn =null; (Connection conn,~)추가해주고 이코드 지워줌!!
 		Statement stmt=null;
@@ -271,6 +332,9 @@ public class MemberDAO {
 		//update니깐DML!!
 		//**원래는 위에 코드 String query =~~는 지워야함!!
 		query = "UPDATE MEMBER_TBL SET MEMBER_PWD = ? ,EMAIL = ? , PHONE = ? , ADDRESS = ? , HOBBY = ? WHERE MEMBER_ID = ?";
+		
+		//아래코드는 properties 쿼리문
+		query = prop.getProperty("updateMember");
 		
 		//Connection conn = null;
 		Statement stmt = null;
@@ -337,6 +401,7 @@ public class MemberDAO {
 	private Connection getConnection() throws ClassNotFoundException, SQLException {
 		// TODO Auto-generated method stub//예외던지기캐치던지기!ADD스로우!
 		Class.forName(DRIVER_NAME);
+		//properties 코드작성!!!
 		Connection conn = DriverManager.getConnection(URL,USERNAME,PASSWORD);
 		return conn;
 	}
