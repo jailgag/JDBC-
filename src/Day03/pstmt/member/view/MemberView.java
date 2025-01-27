@@ -111,8 +111,9 @@ public class MemberView {
 		String email = sc.next();
 		System.out.print("전화번호 :");
 		String phone = sc.next();
+		sc.nextLine();
 		System.out.print("주소 :");
-		String address = sc.next();
+		String address = sc.nextLine();
 		System.out.print("취미 :");
 		String hobby = sc.next();
 		//입력한 데이터를 객체 초기화함. 객체 생성됨

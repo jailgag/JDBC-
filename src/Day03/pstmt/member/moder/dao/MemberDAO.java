@@ -31,7 +31,14 @@ public class MemberDAO {
 	 */
 	
 	//1.회원가입 Controller에서 넘어옴!
-	public int insertMember(Member member) {
+	
+	//아래코드 (Member member) MemberService에서 에러
+	//에러:The method insertMember(Member) in the type MemberDAO is not applicable for the arguments (Connection, Member)
+	//그래서 아래 코드 Connection conn 추가!!
+	//추가 해줬기 때문에 아래Connection conn= null;
+	//conn이 에러:Duplicate local variable conn
+	//그래서 Connection conn= null; 지워줌!!난 주석처리!!
+	public int insertMember(Connection conn,Member member) { //**()안에 Connection conn 추가해줌!!
 		// TODO Auto-generated method stub
 		String query = "INSERT INTO MEMBER_TBL(MEMBER_ID,MEMBER_PWD, MEMBER_NAME,AGE)" 
 				+"VALUES('"+member.getMemberId()+"','"+member.getMemberPwd()+"','"+member.getMemberName()+"',"+member.getAge()+")";
@@ -44,7 +51,8 @@ public class MemberDAO {
 		query ="INSERT INTO MEMBER_TBL(MEMBER_ID, MEMBER_PWD, MEMBER_NAME, AGE) VALUES(?,?,?,?)";
 		
 		int result = 0; 
-		Connection conn= null;
+		//Connection conn= null; 주석처리!!!(Connection conn,~~_)추가후
+		//에러 나서 위에 코드 주석처리함!!원랜 지워줘야한다!!
 		Statement stmt=null; 
 		//*2.
 		PreparedStatement pstmt = null; //*2.작성!
@@ -86,7 +94,7 @@ public class MemberDAO {
 		return result;
 	}
 	//4.회원정보조회(3번째 finally)
-	public List<Member> selectList() {
+	public List<Member> selectList(Connection conn) { //1.**(Connection conn)추가!
 		// TODO Auto-generated method stub
 		//모듈화!!
 		
@@ -96,7 +104,7 @@ public class MemberDAO {
 		
 		String query = "SELECT * FROM MEMBER_TBL"; 
 		List<Member> mList = new ArrayList<Member>();
-		Connection conn=null;
+		//Connection conn=null; //**2.지우고!!
 		Statement stmt=null;
 		ResultSet rset=null;
 		try {
@@ -135,7 +143,7 @@ public class MemberDAO {
 		return mList;
 	}
 	//5.회원검색(올려줌)(4번째finally)
-	public Member selectOneById(String memberId) {
+	public Member selectOneById(Connection conn,String memberId) { //*1.(Connection conn,~추가)
 		/*
 		 * 1. 쿼리문에 위치홀더(?) 
 		 * 2. PreparedStatement 생성
@@ -147,11 +155,13 @@ public class MemberDAO {
 		//위코드대신~아래코드 물음표로 대체!!!
 		query = "SELECT * FROM MEMBER_TBL WHERE MEMBER_ID = ?"; //*1.
 		Member member = null;
-		Connection conn =null;
+		//Connection conn =null;  **2. (Connection conn,~~)추가후 지우기!!
 		Statement stmt =null;
 		PreparedStatement pstmt = null; //*2.이거 선언을하고!
 		ResultSet rset=null;
 		try {
+			//아래 conn = this.getConnection();
+			//코드 Connection 모듈화해서 지워줘도 된다??
 			conn = this.getConnection();//3번캐치!
 			stmt = conn.createStatement();
 			pstmt = conn.prepareStatement(query);//*3.쿼리문동작!코드작성
@@ -193,7 +203,7 @@ public class MemberDAO {
 		
 	}
 	//3.회원탈퇴(올려줌)(2번째finally)
-	public int deleteMember(String memberId) {
+	public int deleteMember(Connection conn,String memberId) {
 		// TODO Auto-generated method stub
 		int result =0;
 		//아래 코드는 대소문자 구문 없이 삭제하는 쿼리문!
@@ -202,7 +212,7 @@ public class MemberDAO {
 		//**1.query문 재 작성 아래코드
 		query ="DELETE FROM MEMBER_TBL WHERE LOWER(MEMBER_ID) = ? ";
 		
-		Connection conn =null;
+		//Connection conn =null; (Connection conn,~)추가해주고 이코드 지워줌!!
 		Statement stmt=null;
 		
 		//**2 PreparedStatement작성!!
@@ -242,7 +252,7 @@ public class MemberDAO {
 		return result;
 	}
 	//2.회원정보수정(올려줌)
-	public int updateMember(Member member) {
+	public int updateMember(Connection conn,Member member) { //1.(Connection conn,~추가 아래2.//Connection conn = null;삭제!
 		// TODO Auto-generated method stub
 		int result =0;
 		//아래쿼리문 작성 잘하기!!
@@ -262,7 +272,7 @@ public class MemberDAO {
 		//**원래는 위에 코드 String query =~~는 지워야함!!
 		query = "UPDATE MEMBER_TBL SET MEMBER_PWD = ? ,EMAIL = ? , PHONE = ? , ADDRESS = ? , HOBBY = ? WHERE MEMBER_ID = ?";
 		
-		Connection conn = null;
+		//Connection conn = null;
 		Statement stmt = null;
 		//**2. pstmt 작성 아래코드
 		PreparedStatement pstmt = null; //*2작성후!
